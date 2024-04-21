@@ -15,7 +15,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
     
     if ( reqType === "order"){
         if(user !== null){
-            if (user["sessionNumber"] >= 2 ){
+            if (user["sessionNumber"] > 2 ){
                 const messageSent = await sendContinueMessage(customerPhone)
                 if(messageSent){
                     return res.status(200).json({ok:"ok"})
