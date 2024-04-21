@@ -18,7 +18,7 @@ const Cart = new Schema<ICart>({
         product: {
             type: Schema.Types.ObjectId,
             ref: 'product',
-            // required: true,
+            required: true,
         },
         qty: { type: Number, required: true }
     }],
@@ -26,7 +26,7 @@ const Cart = new Schema<ICart>({
         variant: {
             type: Schema.Types.ObjectId,
             ref: 'variant',
-            // required: true,
+            required: true,
         },
         qty: { type: Number, required: true }
     }],

@@ -12,7 +12,7 @@ export interface IOrder {
     items: {
         name: string,
         price: number,
-        currency: 'usd',
+        currency: 'inr',
         qty: number
     }[],
 }

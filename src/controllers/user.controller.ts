@@ -5,7 +5,10 @@ import { ApiError } from '../error/ApiError'
 import { Types } from 'mongoose'
 
 const list = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
+    
     const users = await User.find()
+    console.log(users)
+    
     return res.status(201).json(users)
 })
 

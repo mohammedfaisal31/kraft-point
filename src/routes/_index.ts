@@ -7,7 +7,8 @@ import cart from './cart.route'
 import checkout from './checkout.route'
 import order from './order.route'
 import asset from './asset.route'
-
+import whatsapp from "./whatsapp.route"
+import payment from './payment.route'
 const router: Router = Router()
 
 router.use('/v1/categories', category);
@@ -18,6 +19,12 @@ router.use('/v1/carts', cart)
 router.use('/v1/checkout', checkout)
 router.use('/v1/orders', order)
 router.use('/v1/assets', asset)
+
+//Whatapp Webhook
+router.use('/v1/whatsapp', whatsapp)
+
+//Payment Webhook
+router.use('/v1/payment', payment)
 
 
 export default router

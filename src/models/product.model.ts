@@ -45,11 +45,11 @@ const Product = new Schema<IProduct>({
     },
     description: {
         type: String,
-        // required: true,
+        required: false,
     },
     slug: {
         type: String,
-        required: true,
+        required: false,
         unique: true,
         trim: true,
         lowercase: true
@@ -65,14 +65,14 @@ const Product = new Schema<IProduct>({
     variantGroups: [{
         name: {
             type: String,
-            required: true,
+            required: false,
             trim: true,
         },
 
         variants: [{
-            name: { type: String, required: true },
-            price: { type: Number, required: true },
-            stock: { type: Number, required: true }
+            name: { type: String, required: false },
+            price: { type: Number, required: false },
+            stock: { type: Number, required: false }
         }],
     }],
     categories: [{
@@ -92,14 +92,14 @@ const Product = new Schema<IProduct>({
     }],
     sku: {
         type: String,
-        required: true,
+        required: false,
         unique: true,
         trim: true,
         uppercase: true
     },
     stock: {
         type: Number,
-        required: true,
+        required: false,
     },
     sold: {
         type: Number,
