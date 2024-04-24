@@ -4,7 +4,7 @@ import { handlePaymentCapturedEvent } from '../utils/payment'
 
 const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
     console.log(_req.body)
-    if(_req.body.entity == "event" && _req.body.event == "payment_link.paid" ){
+    if(_req.body.entity == "event" && _req.body.event == "payment_link.paid"){
         const updatedWhatsAppStatus = await handlePaymentCapturedEvent(_req.body.payload)
         if(updatedWhatsAppStatus){
             return res.status(200)

@@ -72,7 +72,11 @@ export async function handlePaymentCapturedEvent(payload: any): Promise<boolean>
         { new: true }
     );
     console.log(updatedOrder)
-    // Create Shiprocket order
+
+    const user :any = await User.findOne({phone:`91${updatedOrder["customerDetails"]["phone"]}`})
+
+    if(user["sessionNumber"] == 5){
+        // Create Shiprocket order
     try {
         const shiprocketOrder = await createShiprocketOrder(updatedOrder);
         console.log("Shiprocket order created:", shiprocketOrder);
@@ -128,6 +132,10 @@ export async function handlePaymentCapturedEvent(payload: any): Promise<boolean>
         console.error("Error updating payment status in WhatsApp:", error);
         return false;
     }
+    }else{
+        return false
+    }
+    
 }
 
 // Function to format each timeline step
@@ -138,6 +146,8 @@ function formatTimelineStep(title: string, description: string): string {
 async function createShiprocketOrder(order: any): Promise<any> {
   
   const order_items = []
+  const shipment_dimensions = []
+  const shipment_weights = []
   for(const item of order.items){
     const associated_product = await Catalogue.findOne({contentID : item.productID})
     const order_item = {
@@ -150,8 +160,15 @@ async function createShiprocketOrder(order: any): Promise<any> {
       "hsn": 9701
     }
 
+    shipment_dimensions.push(associated_product?.dimesnions)
+    shipment_weights.push(associated_product?.weight)
     order_items.push(order_item)
   }
+  const shipment_weights_sum = shipment_weights.reduce((accumulator:any, currentValue:any) => accumulator + currentValue, 0);
+  const maxDimensionElement = shipment_dimensions.reduce((max:any, current:any) => {
+    return max.length > current.length ? max : current;
+  }, shipment_dimensions[0]);
+
   const data = {
       "order_id": order._id, 
       "order_date": order.createdAt.toISOString(), 
@@ -186,10 +203,10 @@ async function createShiprocketOrder(order: any): Promise<any> {
       "giftwrap_charges": 0, 
       "transaction_charges": 0, 
       "total_discount": 0, 
-      "length": 10, 
-      "breadth": 15, 
-      "height": 20, 
-      "weight": 2.5 
+      "length": maxDimensionElement.length, 
+      "breadth": maxDimensionElement.breadth, 
+      "height": maxDimensionElement.height, 
+      "weight": shipment_weights_sum
   };
 
   console.log("CREATABLE SHIPROCKET ORDER")

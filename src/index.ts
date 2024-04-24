@@ -31,7 +31,7 @@ app.use("/api/v1/checkout/webhook", bodyParser.raw({ type: '*/*' }));
 app.use(express.json())
 // app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
 
-app.use('/api', routes)
+app.use('/kraft/api', routes)
 
 app.use((_, res, next) => {
     res.status(404).send({ message: 'PAGE_NOT_FOUND' })

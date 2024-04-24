@@ -50,17 +50,23 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
         
     }
     else if( reqType === "interactive"){
-        const created_order :any = await processAndUpdateOrder(data);
-       if(created_order !== null){
-            const created_payment_link : any  = await createPaymentOrder(created_order)
-            const created_payment_intent : any = await sendPaymentIntent(created_order,created_payment_link["short_url"],customerPhone)
-            if(created_payment_intent){
-                return res.status(200).json({ok:"ok"})
-            }else{
-                return res.status(400).json({err:"error"})
-            }
-            
-        }  
+        if(user !== null){
+            const created_order :any = await processAndUpdateOrder(data);
+            if(created_order !== null ){
+                if(user["sessionNumber"] == 4){
+                    const created_payment_link : any  = await createPaymentOrder(created_order)
+                    const created_payment_intent : any = await sendPaymentIntent(created_order,created_payment_link["short_url"],customerPhone)
+                
+                    if(created_payment_intent){
+                        return res.status(200).json({ok:"ok"})
+                    }else{
+                        return res.status(400).json({err:"error"})
+                    }
+                }
+                
+            }    
+        }
+         
     }
 
     return res.status(200).json({ok:"ok"})
