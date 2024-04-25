@@ -45,6 +45,7 @@ export async function createPaymentOrder(order:any):Promise<Object | null>{
           callback_method: "get"
         })
         if(created_payment_link){
+            console.log(created_payment_link)
             return created_payment_link
         }else{
             return null
