@@ -141,7 +141,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
         type: "image",
         image: {
           //link: `${envConfig.server_url}/kraft/api/v1/productsimages/${order_items[0]["retailer_id"]}.jpeg`          
-          link : "https://png.pngtree.com/png-clipart/20190920/original/pngtree-shopping-cart-convenient-icon-png-image_4637407.jpg"
+          link : "https://www.freeiconspng.com/download/28356"
         }
       },
       body: {
