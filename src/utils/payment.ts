@@ -165,6 +165,9 @@ async function createShiprocketOrder(order: any): Promise<any> {
     shipment_weights.push(associated_product?.weight)
     order_items.push(order_item)
   }
+
+  console.log(shipment_dimensions)
+
   const shipment_weights_sum = shipment_weights.reduce((accumulator:any, currentValue:any) => accumulator + currentValue, 0);
   const maxDimensionElement = shipment_dimensions.reduce((max:any, current:any) => {
     return max.length > current.length ? max : current;
