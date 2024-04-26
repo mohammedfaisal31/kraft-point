@@ -16,6 +16,7 @@ const bypass = [
     '/api/v1/checkout',
     '/api/v1/whatsapp',
     '/api/v1/payment',
+    '/api/v1/productsimages'
     
 ]
 

@@ -9,6 +9,8 @@ import order from './order.route'
 import asset from './asset.route'
 import whatsapp from "./whatsapp.route"
 import payment from './payment.route'
+import productsImages from './products.route'
+
 const router: Router = Router()
 
 router.use('/v1/categories', category);
@@ -25,6 +27,10 @@ router.use('/v1/whatsapp', whatsapp)
 
 //Payment Webhook
 router.use('/v1/payment', payment)
+
+//Products 
+router.use('/v1/productsimages', productsImages)
+
 
 
 export default router

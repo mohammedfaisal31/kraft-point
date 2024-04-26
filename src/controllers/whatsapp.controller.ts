@@ -24,7 +24,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   if (reqType === "order") {
     if (user !== null) {
       console.log("User found");
-      if (user["sessionNumber"] > 2) {
+      if (user["sessionNumber"] > 2 && user["sessionNumber"] < 6) {
         const messageSent = await sendContinueMessage(customerPhone);
         if (messageSent) {
           return res.status(200).json({ ok: "ok" });
@@ -36,6 +36,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
         console.log(orderValue);
         if (orderValue) {
           if (await sendFlow("1596386641159809", customerPhone)) {
+            console.log("--------------------------------- SENDING RESPONSE 200 ---------------------------------")
             return res.status(200).json({ ok: "ok" });
           } else {
             return res.status(400).json({ err: "error" });
@@ -73,6 +74,8 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
         }
       }
     }
+  } else {
+    return res.status(200)
   }
 
   return res.status(200).json({ ok: "ok" });

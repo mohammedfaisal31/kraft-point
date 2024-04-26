@@ -28,10 +28,10 @@ export async function sendFlow(flowId: string, toNumber: string):Promise<Boolean
                 "text": "Shipping Details"
               },
             body: {
-                "text": "Please Enter Shipping Details"
+                "text": "Hey there👋\n\nWe've received your request\n\nLet's add a touch of creativity to your surroundings!\n\nDrop your info and let's curate your home decor🌟"
               },
             footer: {
-                "text": "Click below"
+                "text": "Click the button below to enter the booking details"
             },
             action: {
                 name: "flow",
@@ -116,7 +116,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
     const productDetails:any  = await Catalogue.findOne({contentID:item?.productID})
     if(productDetails){
       const object = {
-        retailer_id: order.customer,
+        retailer_id: item?.productID,
         name: productDetails["title"], 
         amount: {
           value: productDetails["price"] * 100, 
@@ -140,8 +140,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
       header: {
         type: "image",
         image: {
-          link: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfhdsIEqvAPDeFTyoQQLsp5Av9HcmqWi7uGuuG8Ap7PUwNZt-fXg41O4ddRany-sxJaiM&usqp=CAU"
-          
+          link: `${envConfig.server_url}/kraft/api/v1/productsimages/${order_items[0]["retailer_id"]}.jpeg`          
         }
       },
       body: {
@@ -230,7 +229,6 @@ export async function sendContinueMessage(toNumber:string){
 }
 
 export  function getRequestType(data:any):string{
-    console.log(JSON.stringify(data))
     return data["entry"][0]["changes"][0]["value"]["messages"][0]["type"]
 }
 

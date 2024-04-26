@@ -10,6 +10,7 @@ import { RequestHandler } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
 import handleError from './error/handleError';
 import bodyParser from 'body-parser';
+import path from 'path';
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -28,8 +29,11 @@ app.use(helmet())
 // webhook payload must be sent raw
 app.use("/api/v1/checkout/webhook", bodyParser.raw({ type: '*/*' }));
 
+
+
 app.use(express.json())
 // app.use((access as unknown) as RequestHandler<ParamsDictionary, any, any, Query>)
+
 
 app.use('/kraft/api', routes)
 
