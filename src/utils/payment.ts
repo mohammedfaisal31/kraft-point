@@ -161,7 +161,7 @@ async function createShiprocketOrder(order: any): Promise<any> {
       "hsn": 9701
     }
 
-    shipment_dimensions.push(associated_product?.dimesnions)
+    shipment_dimensions.push(associated_product?.dimensions)
     shipment_weights.push(associated_product?.weight)
     order_items.push(order_item)
   }

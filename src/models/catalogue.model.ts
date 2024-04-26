@@ -13,7 +13,7 @@ const catalogueSchema = new Schema<ICatalogue>({
   status: { type: Boolean, required: true },
   brand: { type: String, required: false },
   contentID: { type: Number, required: true, unique: true },
-  dimesnions : {
+  dimensions : {
     length : { type: Number, required: true},
     breadth : { type: Number, required: true},
     height : { type: Number, required: true}
@@ -35,7 +35,7 @@ interface ICatalogue {
   status: Boolean;
   brand?: string;
   contentID: Number;
-  dimesnions : Object;
+  dimensions : Object;
   weight : Number
 }
 
