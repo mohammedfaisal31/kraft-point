@@ -140,8 +140,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
       header: {
         type: "image",
         image: {
-          //link: `${envConfig.server_url}/kraft/api/v1/productsimages/${order_items[0]["retailer_id"]}.jpeg`          
-          link : "https://www.freeiconspng.com/download/28356"
+          link: `${envConfig.server_url}/kraft/api/v1/productsimages/${order_items[0]["retailer_id"]}.jpeg`          
         }
       },
       body: {
@@ -173,7 +172,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
             status: order.paymentStatus,
             catalog_id: "976461464076822",
             expiration: {
-              timestamp: Math.floor((Date.now()+24 * 60 * 60 * 1000) / 1000), // 1 day expiration time
+              timestamp: Math.floor((Date.now()+72 * 60 * 60 * 1000) / 1000), // 1 day expiration time
               description: "Order will be automatically cancelled after expiration."
             },
             items: order_items,
