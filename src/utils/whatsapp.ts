@@ -140,10 +140,8 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
       header: {
         type: "image",
         image: {
-          link: `${envConfig.server_url}/products/${order_items[0]["retailer_id"]}.jpeg`,
-          provider:{
-            name:"Kraft Point"
-          }
+          link: `${envConfig.server_url}/products/${order_items[0]["retailer_id"]}.jpeg`
+          
         }
       },
       body: {
