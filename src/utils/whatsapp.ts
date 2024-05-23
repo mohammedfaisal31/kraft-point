@@ -199,7 +199,7 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
 
   }
 
-  console.log("WHATSAPP INDENT",data)
+  console.log("WHATSAPP INDENT",JSON.stringify(data))
   try {
     const response = await axios.post(url, data, { headers });
     console.log("Payment Intent sent successfully:", response.data);
