@@ -48,7 +48,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
       }
     }
   } else if (reqType === "interactive") {
-    if (user !== null && user["sessionNumber"] == 4) {
+    if (user !== null && user["sessionNumber"] == 3) {
       const created_order: any = await processAndUpdateOrder(data);
       console.log("ORDER",created_order)
       if (created_order !== null) {
