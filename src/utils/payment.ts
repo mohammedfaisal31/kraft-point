@@ -56,33 +56,48 @@ export async function createPaymentOrder(order: any): Promise<Object | null> {
 }
 
 // Assuming you have the Shiprocket token
-
-export async function handlePaymentCapturedEvent(
-  payload: any
-): Promise<boolean> {
-  console.log("PAYLOAD",payload);
-  const {status,payment_request_id,payment_id} = payload
-  console.log(status)
-  console.log(payment_request_id)
-  console.log(payment_id)
+export async function handlePaymentCapturedEvent(payload: any): Promise<boolean> {
+  console.log("PAYLOAD", payload);
   
-  // if(status !== "Credit"){
-  //   return false
-  // }
+  const { event, payload: eventPayload } = payload;
+  
+  if (event !== "payment.captured") {
+    console.log("Event is not payment.captured");
+    return false;
+  }
+  
+  const paymentEntity = eventPayload.payment.entity;
+  const { contact, id: payment_id } = paymentEntity;
 
-  const updatedOrder: any = await Order.findOneAndUpdate(
-    { paymentRequestID: payment_request_id },
-    { $set: { paymentStatus: "completed", status: "processing" ,paymentID:payment_id} },
+  // Remove the first character `+` from the contact string
+  const formattedContact = contact.startsWith('+') ? contact.substring(3) : contact;
+  
+  // Find the order using the contact number and active status
+  const order = await Order.findOne({ "customerDetails.phone": formattedContact, status: "active" });
+  
+  if (!order) {
+    console.log("No active order found for contact:", contact);
+    return false;
+  }
+  
+  // Update the order with payment details
+  const updatedOrder = await Order.findOneAndUpdate(
+    { _id: order._id },
+    { $set: { paymentStatus: "completed", status: "processing", paymentID: payment_id } },
     { new: true }
   );
-  console.log(updatedOrder);
-
-  const user: any = await User.findOne({
-    phone: `91${updatedOrder["customerDetails"]["phone"]}`,
-  });
-
-  if (user["sessionNumber"] == 5) {
-    // Create Shiprocket order
+  
+  if (!updatedOrder) {
+    console.log("Failed to update the order");
+    return false;
+  }
+  
+  console.log("Updated Order:", updatedOrder);
+  
+  const user = await User.findOne({ phone: `91${updatedOrder.customerDetails.phone}` });
+  
+  if (user?.sessionNumber === 5) {
+    // Create Shiprocket order (assumed function, replace with actual implementation)
     try {
       const shiprocketOrder = await createShiprocketOrder(updatedOrder);
       console.log("Shiprocket order created:", shiprocketOrder);
@@ -90,19 +105,14 @@ export async function handlePaymentCapturedEvent(
       console.error("Error creating Shiprocket order:", error);
       return false;
     }
-
-    const linkedUser = await User.findOne({
-      phone: `91${updatedOrder["customerDetails"]["phone"]}`,
-    });
-    console.log(linkedUser);
-
-    // Prepare WhatsApp message payload with a stylish timeline
-    const whatsappMessage = `\nThank you for placing the order🙏\n\nYour Order ID is *${updatedOrder._id}*\n\nYour payment has been successfully captured✅\n------------------------------------\n*ORDER:PROCESSING🕒*\n------------------------------------\n\nWe will notify you once the order is dispatched and shipped😊`;
-
+  
+    // Prepare WhatsApp message payload
+    const whatsappMessage = `\nThank you for placing the order🙏\n\nYour Order ID is *${updatedOrder._id}*\n\nYour payment has been successfully captured✅\n------------------------------------\n*ORDER:PROCESSING🕒*\n------------------------------------\n\nWe will notify you once the order is dispatched and shipped😊\n\n Order Tracking details will be shared shortly🚚`;
+  
     const whatsappPayload = {
       messaging_product: "whatsapp",
       recipient_type: "individual",
-      to: `91${updatedOrder["customerDetails"]["phone"]}`,
+      to: `91${updatedOrder.customerDetails.phone}`,
       type: "interactive",
       interactive: {
         type: "order_status",
@@ -121,17 +131,17 @@ export async function handlePaymentCapturedEvent(
         },
       },
     };
-
+  
     try {
-      if (linkedUser?.sessionNumber == 5) {
-        const response = await axios.post(url, whatsappPayload, { headers });
-        console.log("Payment status updated in WhatsApp:", response.data);
-      }
-      const updatedUser = await User.findOneAndUpdate(
-        { phone: `91${updatedOrder["customerDetails"]["phone"]}` },
+      const response = await axios.post(url, whatsappPayload, { headers });
+      console.log("Payment status updated in WhatsApp:", response.data);
+  
+      await User.findOneAndUpdate(
+        { phone: `91${updatedOrder.customerDetails.phone}` },
         { $set: { sessionNumber: 6 } },
         { new: true }
       );
+      
       return true;
     } catch (error: any) {
       console.error("Error updating payment status in WhatsApp:", error);
@@ -141,7 +151,6 @@ export async function handlePaymentCapturedEvent(
     return false;
   }
 }
-
 async function createShiprocketOrder(order: any): Promise<any> {
   const order_items = [];
   const shipment_dimensions = [];
@@ -234,4 +243,12 @@ async function createShiprocketOrder(order: any): Promise<any> {
 
   const response = await axios(config);
   return response.data;
+}
+
+
+export async function rzpay(
+  payload: any
+): Promise<boolean> {
+  //Logic to capture payment in database
+  return true
 }

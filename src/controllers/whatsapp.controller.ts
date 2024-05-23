@@ -52,14 +52,16 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
       const created_order: any = await processAndUpdateOrder(data);
       console.log("ORDER",created_order)
       if (created_order !== null) {
-        const created_payment_link: any = await createPaymentOrder(created_order);
-        console.log(created_payment_link)
-        if (created_payment_link) {
-          await sendPaymentIntent(created_order,created_payment_link.longurl,customerPhone)
-          return res.status(200).json({ ok: "ok" });
-        } else {
-          return res.status(400).json({ err: "error" });
-        }
+        // const created_payment_link: any = await createPaymentOrder(created_order);
+        // console.log(created_payment_link)
+        // if (created_payment_link) {
+        //   await sendPaymentIntent(created_order,created_payment_link.longurl,customerPhone)
+        //   return res.status(200).json({ ok: "ok" });
+        // } else {
+        //   return res.status(400).json({ err: "error" });
+        // }
+        await sendPaymentIntent(created_order,customerPhone)
+        return res.status(200).json({ ok: "ok" });
       }
     }
   } else {
