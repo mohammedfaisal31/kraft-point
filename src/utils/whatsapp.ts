@@ -141,7 +141,6 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
         type: "image",
         image: {
           link: `${envConfig.server_url}/products/${order_items[0]["retailer_id"]}.jpeg`
-          
         }
       },
       body: {
@@ -199,6 +198,8 @@ export async function sendPaymentIntent(order:any,link:String,toNumber:String):P
     interactive : orderDetails.interactive
 
   }
+
+  console.log("WHATSAPP INDENT",data)
   try {
     const response = await axios.post(url, data, { headers });
     console.log("Payment Intent sent successfully:", response.data);
