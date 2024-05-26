@@ -16,6 +16,7 @@ import orderController from "./order.controller";
 import e from "express";
 import orderModel from "../models/order.model";
 import userModel from "../models/user.model";
+import continueWBK from "../models/continueWBK";
 
 const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   const data = _req.body;
@@ -77,14 +78,9 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
       }
     }
   } else if (reqType === "button"){
-
+    const timestamp = data["entry"][0]["changes"][0]["value"]["messages"][0]["timestamp"];
     if(user){
-      if(user?.continueFlow === user?.sessionNumber ){
-        await handleContinuePrompt(customerPhone,data)
-        await userModel.updateOne({_id:user._id},{$inc:{continueFlow:1}})
-      } else {
-        await userModel.updateOne({_id:user._id},{$set:{continueFlow:user?.sessionNumber}})
-      }
+      await handleContinuePrompt(customerPhone,data)
     }
     return res.status(200);
   }
