@@ -13,6 +13,7 @@ export interface IUser extends Document{
     phone: string,
     whatsapp : Boolean,
     sessionNumber : number,
+    continueFlow:number,
     forgotPasswordCode?: number | null,
     address?: [{
         country?: string | undefined;
@@ -56,6 +57,10 @@ const User = new Schema<IUser>({
     sessionNumber : {
         type : Number,
         default : 0
+    },
+    continueFlow : {
+        type : Number,
+        default : 3
     },
     forgotPasswordCode: { type: String },
     oAuth: { type: Boolean, default: false, select: false }
