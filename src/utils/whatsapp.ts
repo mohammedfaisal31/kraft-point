@@ -1,10 +1,13 @@
 import WhatsAppOrder from "../types/whatsappOrder";
 import Catalogue from "../models/catalogue.model";
 import Order from "../models/order.model";
+import orderMaster from "../models/orderMaster";
 import User from "../models/user.model";
 import axios from "axios";
 
 import envConfig from "../config";
+import { language } from "googleapis/build/src/apis/language";
+import orderModel from "../models/order.model";
 
 const accessToken = envConfig.whatsapp.access_token;
 const url = envConfig.whatsapp.graph_uri;
@@ -253,17 +256,37 @@ export async function sendPaymentIntent(
   }
 }
 
-export async function sendContinueMessage(toNumber: string) {
+export async function sendOrderContinuationPrompt(toNumber: string,existingOrderorder:any,newOrder:any) {
+  const user = await User.findOne({phone:toNumber})
+  const order = await getOrderValue(newOrder,true)
   const data = {
     recipient_type: "individual",
     messaging_product: "whatsapp",
     to: toNumber,
-    type: "text",
-    text: {
-      body: "You have an active order which is not fulfilled yet! Please complete the order first",
+    type: "template",
+    template: {
+      name: "fraud_alert_2",
+      language:{
+        code:"en_US"
+      }
     },
+    components:[
+      {
+        type:"body",
+        parameters:[
+          {
+            type:"text",
+            text : user?.firstname !== null ? user?.firstname : "there"
+          },
+          {
+            type:"text",
+            text : existingOrderorder._id.toString()
+          }
+        ]
+      }
+    ]
   };
-
+  console.log(JSON.stringify(data))
   try {
     const response = await axios.post(url, data, { headers });
     console.log("Message sent successfully:", response.data);
@@ -310,9 +333,9 @@ async function createUserFromOrder(
     throw error; // Re-throw for handling in processOrder
   }
 }
-async function insertOrder(orderData: any) {
+async function insertOrder(orderData: any,master:Boolean) {
   try {
-    const newOrder = new Order(orderData);
+    const newOrder = master ? new orderMaster(orderData) : new Order(orderData)
     await newOrder.save();
     console.log("Order created successfully:", newOrder._id);
     return newOrder;
@@ -323,7 +346,7 @@ async function insertOrder(orderData: any) {
 }
 
 export async function getOrderValue(
-  order: WhatsAppOrder
+  order: WhatsAppOrder, master:Boolean
 ): Promise<number | null> {
   const { product_items } =
     order["entry"][0]["changes"][0]["value"]["messages"][0]["order"];
@@ -381,7 +404,7 @@ export async function getOrderValue(
       customer: customer._id,
       total: totalPrice,
       items: items,
-    });
+    },master);
     if (createdOrder) {
       return totalPrice;
     } else {
@@ -390,4 +413,50 @@ export async function getOrderValue(
   } else {
     return null;
   }
+}
+
+
+export async function handleContinuePrompt(customerPhone: string, data: any): Promise<Boolean> {
+  const buttonText = data.entry[0].changes[0].value.messages[0].button.text;
+  console.log(buttonText)
+  if (buttonText === "Continue") {
+    const user = await User.findOne({phone:customerPhone})
+    const updatedOrder = await orderModel.deleteOne({status:"active"})
+    const existingOrder = await orderMaster.findOne({ customer:user?._id, status: "active" });
+
+    if (existingOrder) {
+      console.log("existing order found",existingOrder)
+      const orderData = existingOrder.toObject(); // Convert Mongoose document to plain object
+      delete orderData._id; // Remove the _id field to avoid duplication
+      const newOrder = new Order(orderData); // Create a new Order instance with the existing order data
+      await newOrder.save(); // Save the new order to the Order collection
+      await orderMaster.deleteOne({ _id: existingOrder._id }); // Remove the order from OrderMaster
+      if(user?.sessionNumber == 2){
+        return await sendFlow("1596386641159809", customerPhone)  
+      } else {
+        return false
+      }
+      
+      
+    }
+    return false;
+
+  } else if (buttonText === "Place Existing Order") {
+    const user = await User.findOne({ phone: customerPhone });
+    if (user) {
+      const existingOrder = await Order.findOne({ customer: user._id, status: { $in: ["active", "processing"] } });
+      const deletedNewOrder = await orderMaster.deleteMany({customer:user._id})
+      console.log("deleted order",deletedNewOrder)
+      if (existingOrder) {
+        if(user?.sessionNumber == 2){
+          return await sendFlow("1596386641159809", customerPhone)  
+        } else {
+          return false
+        }
+      }
+    }
+    return false;
+  }
+
+  return false;
 }

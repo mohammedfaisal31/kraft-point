@@ -7,40 +7,59 @@ import {
   sendFlow,
   processAndUpdateOrder,
   sendPaymentIntent,
-  sendContinueMessage,
+  sendOrderContinuationPrompt,
+  handleContinuePrompt
 } from "../utils/whatsapp";
 import User from "../models/user.model";
 import { createPaymentOrder } from "../utils/payment";
 import orderController from "./order.controller";
 import e from "express";
+import orderModel from "../models/order.model";
 
 const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   const data = _req.body;
   const reqType = getRequestType(data);
   const customerPhone =
-    data["entry"][0]["changes"][0]["value"]["messages"][0]["from"];
+  data["entry"][0]["changes"][0]["value"]["messages"][0]["from"];
   const user = await User.findOne({ phone: customerPhone });
-  console.log(reqType);
+  console.log(JSON.stringify(data));
+
   if (reqType === "order") {
     if (user !== null) {
       console.log("User found");
-      if (user["sessionNumber"] <= 1 ) {
-        const orderValue = await getOrderValue(data);
-        console.log(orderValue);
-        if (orderValue) {
-          if (await sendFlow("1596386641159809", customerPhone)) {
-            console.log("--------------------------------- SENDING RESPONSE 200 ---------------------------------")
-            return res.status(200).json({ ok: "ok" });
+
+      const existingOrder = await orderModel.findOne({
+        customer: user._id,
+        status: { $in: ["active", "processing"] },
+      });
+
+      if (existingOrder) {
+        console.log("Existing order found");
+        if (await sendOrderContinuationPrompt(customerPhone,existingOrder,data)) {
+          return res.status(200).json({ ok: "ok" });
+        } else {
+          return res.status(400).json({ err: "error" })
+        }
+      } else {
+        if (user["sessionNumber"] <= 3) {
+          const orderValue = await getOrderValue(data,false);
+          console.log(orderValue);
+          if (orderValue) {
+            if (await sendFlow("1596386641159809", customerPhone)) {
+              console.log(
+                "--------------------------------- SENDING RESPONSE 200 ---------------------------------"
+              );
+              return res.status(200).json({ ok: "ok" });
+            } else {
+              return res.status(400).json({ err: "error" });
+            }
           } else {
             return res.status(400).json({ err: "error" });
           }
-        } else {
-          return res.status(400).json({ err: "error" });
         }
       }
-      
     } else {
-      const orderValue = await getOrderValue(data);
+      const orderValue = await getOrderValue(data,false);
       if (orderValue && (await sendFlow("1596386641159809", customerPhone))) {
         return res.status(200).json({ ok: "ok" });
       } else {
@@ -50,22 +69,15 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   } else if (reqType === "interactive") {
     if (user !== null && user["sessionNumber"] == 3) {
       const created_order: any = await processAndUpdateOrder(data);
-      console.log("ORDER",created_order)
+      console.log("ORDER", created_order);
       if (created_order !== null) {
-        // const created_payment_link: any = await createPaymentOrder(created_order);
-        // console.log(created_payment_link)
-        // if (created_payment_link) {
-        //   await sendPaymentIntent(created_order,created_payment_link.longurl,customerPhone)
-        //   return res.status(200).json({ ok: "ok" });
-        // } else {
-        //   return res.status(400).json({ err: "error" });
-        // }
-        await sendPaymentIntent(created_order,customerPhone)
+        await sendPaymentIntent(created_order, customerPhone);
         return res.status(200).json({ ok: "ok" });
       }
     }
-  } else {
-    return res.status(200)
+  } else if (reqType === "button"){
+    await handleContinuePrompt(customerPhone,data)
+    return res.status(200);
   }
 
   return res.status(200).json({ ok: "ok" });
