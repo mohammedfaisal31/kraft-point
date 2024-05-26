@@ -40,7 +40,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
         if (await sendOrderContinuationPrompt(customerPhone,existingOrder,data)) {
           return res.status(200).json({ ok: "ok" });
         } else {
-          return res.status(400).json({ err: "error" })
+          return res.status(200).json({ err: "error" })
         }
       } else {
         if (user["sessionNumber"] <= 3) {
@@ -53,10 +53,10 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
               );
               return res.status(200).json({ ok: "ok" });
             } else {
-              return res.status(400).json({ err: "error" });
+              return res.status(200).json({ err: "error" });
             }
           } else {
-            return res.status(400).json({ err: "error" });
+            return res.status(200).json({ err: "error" });
           }
         }
       }
@@ -65,7 +65,7 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
       if (orderValue && (await sendFlow("1596386641159809", customerPhone))) {
         return res.status(200).json({ ok: "ok" });
       } else {
-        return res.status(400).json({ err: "error" });
+        return res.status(200).json({ err: "error" });
       }
     }
   } else if (reqType === "interactive") {
