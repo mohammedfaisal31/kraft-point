@@ -421,7 +421,7 @@ export async function handleContinuePrompt(customerPhone: string, data: any): Pr
   console.log(buttonText)
   if (buttonText === "Continue") {
     const user = await User.findOne({phone:customerPhone})
-    const updatedOrder = await orderModel.deleteOne({status:"active"})
+    const updatedOrder = await orderModel.deleteOne({customer:user?._id,status:"active"})
     const existingOrder = await orderMaster.findOne({ customer:user?._id, status: "active" });
 
     if (existingOrder) {
@@ -444,7 +444,7 @@ export async function handleContinuePrompt(customerPhone: string, data: any): Pr
   } else if (buttonText === "Place Existing Order") {
     const user = await User.findOne({ phone: customerPhone });
     if (user) {
-      const existingOrder = await Order.findOne({ customer: user._id, status: { $in: ["active", "processing"] } });
+      const existingOrder = await Order.findOne({ customer: user._id, status: "active" });
       const deletedNewOrder = await orderMaster.deleteMany({customer:user._id})
       console.log("deleted order",deletedNewOrder)
       if (existingOrder) {
