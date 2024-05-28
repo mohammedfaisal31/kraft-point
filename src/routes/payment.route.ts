@@ -7,7 +7,7 @@ const router: Router = Router()
 router.use(express.urlencoded({ extended: true }));
 //router.post('/webhook', controller.receive);
 
-router.post('/rzpay', controller.receive);
+router.post('/rzpay', controller.rzpayRcv);
 
 
 
