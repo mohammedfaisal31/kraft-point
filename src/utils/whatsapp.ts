@@ -43,7 +43,7 @@ export async function sendFlow(
           flow_message_version: "3",
           flow_token: "AQAAAAACS5FpgQ_cAAAAAD0QI3s.",
           flow_id: flowId,
-          flow_cta: "Enter booking details",
+          flow_cta: "Checkout Now",
           flow_action: "navigate",
           flow_action_payload: {
             screen: "SHIP", // Change this to the appropriate screen ID
@@ -216,7 +216,7 @@ export async function sendPaymentIntent(
                       value: 0,
                     },
                   },
-                  payment_configuration: "test_rzpay",
+                  payment_configuration: "kraft_point_razorpay",
                   payment_type: "payment_gateway:razorpay",
                   reference_id: order._id,
                   total_amount: {
