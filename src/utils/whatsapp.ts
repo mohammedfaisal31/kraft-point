@@ -169,9 +169,11 @@ export async function sendPaymentIntent(
     });
     console.log("Product", productDetails);
     if (productDetails !== null && productDetails.salePrice !== undefined) {
+      console.log(productDetails)
       total_discount +=
         (productDetails["price"] - productDetails["salePrice"]) * item.qty;
     }
+    console.log("LOWER",productDetails)
   }
 
   const orderDetails = {
