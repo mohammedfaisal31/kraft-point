@@ -157,7 +157,7 @@ export async function sendPaymentIntent(
           postal_code: order["shippingAddress"]["pincode"],
         },
       };
-      sub_total += productDetails["price"];
+      sub_total += (productDetails["price"] * item.qty);
       order_items.push(object);
     }
   }
@@ -171,7 +171,7 @@ export async function sendPaymentIntent(
     if (productDetails !== null && productDetails.salePrice !== undefined) {
       console.log(productDetails)
       total_discount +=
-        (productDetails["price"] - productDetails["salePrice"]);
+        (productDetails["price"] - productDetails["salePrice"]) * item.qty;
     }
     console.log("LOWER",productDetails)
     console.log("total discount",total_discount)
