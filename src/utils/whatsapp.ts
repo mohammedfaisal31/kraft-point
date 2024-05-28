@@ -174,6 +174,7 @@ export async function sendPaymentIntent(
         (productDetails["price"] - productDetails["salePrice"]) * item.qty;
     }
     console.log("LOWER",productDetails)
+    console.log("total discount",total_discount)
   }
 
   const orderDetails = {
