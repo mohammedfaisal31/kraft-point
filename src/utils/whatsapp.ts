@@ -439,7 +439,7 @@ export async function handleContinuePrompt(
       const existingOrder = await orderMaster.findOne({
         customer: user?._id,
         status: "active",
-      });
+      }).sort({ _id: -1 });
 
       if (existingOrder) {
         console.log("existing order found", existingOrder);

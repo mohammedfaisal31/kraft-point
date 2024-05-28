@@ -6,9 +6,6 @@ import { handlePaymentCapturedEvent, rzpay } from "../utils/payment";
 const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   console.log("--------Payment Webhook----------------");
   await handlePaymentCapturedEvent(_req.body)
-    
-  
-
   return res.status(200);
 });
 
