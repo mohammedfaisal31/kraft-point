@@ -216,7 +216,7 @@ export async function sendPaymentIntent(
                       value: 0,
                     },
                   },
-                  payment_configuration: "kraft_point_razorpay",
+                  payment_configuration: "test_rzpay",
                   payment_type: "payment_gateway:razorpay",
                   reference_id: order._id,
                   total_amount: {
