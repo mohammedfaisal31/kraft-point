@@ -11,7 +11,11 @@ const receive = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
 
 const rzpayRcv = asyncMiddleware(async (_req: Req, res: Res): Promise<Res> => {
   console.log("--------Razorpay Payment Webhook----------------");
-  await rzpay(_req.body)
+
+  console.time("rzpayExecutionTime"); // Start the timer
+  await rzpay(_req.body);
+  console.timeEnd("rzpayExecutionTime"); // End the timer and log the elapsed time
+
   return res.status(200);
 });
 
