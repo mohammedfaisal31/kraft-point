@@ -171,7 +171,7 @@ export async function sendPaymentIntent(
     if (productDetails !== null && productDetails.salePrice !== undefined) {
       console.log(productDetails)
       total_discount +=
-        (productDetails["price"] - productDetails["salePrice"]) * item.qty;
+        (productDetails["price"] - productDetails["salePrice"]);
     }
     console.log("LOWER",productDetails)
     console.log("total discount",total_discount)
